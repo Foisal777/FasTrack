@@ -1,126 +1,299 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Courses | FasTrack Japanese</title>
-    <style>
-        body { margin:0; overflow:hidden; font-family:'Segoe UI','Noto Sans JP',sans-serif; color:white; }
-        #canvas-container { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; }
-        .content { position:relative; z-index:10; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(0,0,0,0.3); backdrop-filter:blur(4px); padding:20px; }
-        nav { position:absolute; top:20px; left:0; right:0; display:flex; justify-content:center; gap:20px; z-index:20; flex-wrap:wrap; }
-        nav a { color:#fff; text-decoration:none; font-weight:bold; font-size:1.1rem; text-shadow:0 0 10px black; padding:8px 16px; border-radius:30px; background:rgba(255,255,255,0.15); backdrop-filter:blur(5px); }
-        nav a:hover { background:#d6336c; }
-        .courses-container { display:flex; flex-wrap:wrap; gap:30px; justify-content:center; max-width:1200px; margin-top:50px; }
-        .course-card { background:rgba(20,10,30,0.75); backdrop-filter:blur(8px); border-radius:20px; padding:25px; width:280px; border:1px solid rgba(255,200,220,0.3); box-shadow:0 0 30px rgba(255,105,180,0.2); transition:0.3s; }
-        .course-card:hover { transform:translateY(-10px); box-shadow:0 0 40px #ff99cc; }
-        h1 { font-size:3rem; margin:10px; text-shadow:0 0 20px #ff99cc; }
-        footer { position:absolute; bottom:10px; left:0; right:0; text-align:center; z-index:20; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Courses - FasTrack Japanese</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700;900&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div id="canvas-container"></div>
-    <nav>
-        <a href="index.html">🏠 Home</a>
-        <a href="about.html">👥 About</a>
-        <a href="courses.html">📚 Courses</a>
-        <a href="culture.html">🎎 Culture</a>
-        <a href="contact.html">📞 Contact</a>
-    </nav>
-    <div class="content">
-        <h1>Our Courses</h1>
-        <div class="courses-container">
-            <div class="course-card"><h2>🌸 Beginner</h2><p>Hiragana, Katakana, basic conversation. 3 months.</p><p><strong>Fee: 8,000 BDT</strong></p></div>
-            <div class="course-card"><h2>🎋 Intermediate</h2><p>Kanji (N4-N3), grammar, listening. 4 months.</p><p><strong>Fee: 10,000 BDT</strong></p></div>
-            <div class="course-card"><h2>⛩️ Advanced</h2><p>JLPT N2/N1 prep, business Japanese. 6 months.</p><p><strong>Fee: 15,000 BDT</strong></p></div>
-            <div class="course-card"><h2>🗾 Culture Workshop</h2><p>Tea ceremony, calligraphy, anime Japanese. 2 months.</p><p><strong>Fee: 5,000 BDT</strong></p></div>
-        </div>
-    </div>
-    <footer>© 2026 FasTrack Japanese Language Centre | Developed by Foisal</footer>
 
-    <script type="importmap">
-        {"imports": {"three": "https://unpkg.com/three@0.128.0/build/three.module.js"}}
-    </script>
-    <script type="module">
-        import * as THREE from 'three';
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x050510);
-        const camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 1000);
-        camera.position.z = 15;
-        const renderer = new THREE.WebGLRenderer({antialias:true});
-        renderer.setSize(innerWidth, innerHeight);
-        document.getElementById('canvas-container').appendChild(renderer.domElement);
-        
-        // Floating Kanji characters as 3D Text
-        const loader = new THREE.FontLoader();
-        // We'll use TextGeometry with a default font from Three.js examples, but we need to load a font.
-        // For simplicity, we'll create sprites with Kanji using Canvas texture.
-        function createKanjiSprite(character, color) {
-            const canvas = document.createElement('canvas');
-            canvas.width = 128;
-            canvas.height = 128;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = 'rgba(0,0,0,0)';
-            ctx.fillRect(0,0,128,128);
-            ctx.font = 'Bold 80px "Noto Sans JP", "MS Gothic", sans-serif';
-            ctx.fillStyle = color;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(character, 64, 64);
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 2;
-            ctx.strokeText(character, 64, 64);
-            const texture = new THREE.CanvasTexture(canvas);
-            const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
-            const sprite = new THREE.Sprite(material);
-            sprite.scale.set(1.5,1.5,1);
-            return sprite;
-        }
-        
-        const kanjiList = ['日', '本', '語', '学', '校', '愛', '夢', '桜', '侍', '道'];
-        const colors = ['#ff99cc','#ffaa66','#66ccff','#99ff99','#ff6666','#cc99ff'];
-        const group = new THREE.Group();
-        kanjiList.forEach((char, i) => {
-            const sprite = createKanjiSprite(char, colors[i % colors.length]);
-            const radius = 6;
-            const angle = (i / kanjiList.length) * Math.PI * 2;
-            sprite.position.x = Math.cos(angle) * radius;
-            sprite.position.y = Math.sin(angle*2) * 2;
-            sprite.position.z = Math.sin(angle) * radius;
-            group.add(sprite);
-        });
-        scene.add(group);
-        
-        // Add particles
-        const starsGeo = new THREE.BufferGeometry();
-        const starsCount = 1000;
-        const starsPos = new Float32Array(starsCount*3);
-        for(let i=0;i<starsCount*3;i+=3){
-            starsPos[i] = (Math.random()-0.5)*200;
-            starsPos[i+1] = (Math.random()-0.5)*200;
-            starsPos[i+2] = (Math.random()-0.5)*200;
-        }
-        starsGeo.setAttribute('position', new THREE.BufferAttribute(starsPos,3));
-        const starsMat = new THREE.PointsMaterial({color:0xffffff, size:0.1});
-        const stars = new THREE.Points(starsGeo, starsMat);
-        scene.add(stars);
-        
-        let clock = new THREE.Clock();
-        function animate(){
-            requestAnimationFrame(animate);
-            const t = performance.now()*0.001;
-            group.rotation.y += 0.002;
-            group.rotation.x = Math.sin(t*0.1)*0.1;
-            stars.rotation.y += 0.0002;
-            renderer.render(scene, camera);
-        }
-        animate();
-        
-        window.addEventListener('resize', ()=>{
-            camera.aspect = innerWidth/innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(innerWidth, innerHeight);
-        });
-    </script>
+<nav class="navbar" id="navbar">
+  <div class="nav-logo">
+    <span class="logo-jp">日本語</span>
+    <span class="logo-text">FasTrack</span>
+  </div>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="courses.html" class="active">Courses</a></li>
+    <li><a href="culture.html">Culture</a></li>
+    <li><a href="team.html">Team</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+</nav>
+
+<canvas id="canvas5d"></canvas>
+
+<section class="page-hero">
+  <div class="page-hero-content">
+    <div class="page-badge">📚 Our Programs</div>
+    <h1 class="page-title">
+      <span class="jp-title">コース一覧</span>
+      <span class="en-title">Our Courses</span>
+    </h1>
+    <p>Comprehensive Japanese language programs for all levels</p>
+  </div>
+</section>
+
+<section class="courses-section">
+  <div class="section-header">
+    <h2>JLPT Level Courses</h2>
+    <p>From beginner to advanced — we've got you covered</p>
+  </div>
+  
+  <div class="courses-grid">
+    <div class="course-card level-n5">
+      <div class="course-badge">N5</div>
+      <div class="course-icon">🌱</div>
+      <h3>JLPT N5</h3>
+      <p class="course-subtitle">Beginner Level</p>
+      <ul class="course-features">
+        <li>✅ Hiragana & Katakana</li>
+        <li>✅ Basic 100 Kanji</li>
+        <li>✅ Elementary Grammar</li>
+        <li>✅ Basic Conversation</li>
+        <li>✅ 3 Months Duration</li>
+      </ul>
+      <div class="course-price">
+        <span class="price">৳ 3,500</span>
+        <span class="price-period">/month</span>
+      </div>
+      <a href="contact.html" class="course-btn">Enroll Now</a>
+    </div>
+
+    <div class="course-card level-n4 featured">
+      <div class="featured-badge">⭐ Popular</div>
+      <div class="course-badge">N4</div>
+      <div class="course-icon">🌿</div>
+      <h3>JLPT N4</h3>
+      <p class="course-subtitle">Elementary Level</p>
+      <ul class="course-features">
+        <li>✅ 300 Kanji Characters</li>
+        <li>✅ Intermediate Grammar</li>
+        <li>✅ Reading Comprehension</li>
+        <li>✅ Listening Skills</li>
+        <li>✅ 4 Months Duration</li>
+      </ul>
+      <div class="course-price">
+        <span class="price">৳ 4,500</span>
+        <span class="price-period">/month</span>
+      </div>
+      <a href="contact.html" class="course-btn">Enroll Now</a>
+    </div>
+
+    <div class="course-card level-n3">
+      <div class="course-badge">N3</div>
+      <div class="course-icon">🌳</div>
+      <h3>JLPT N3</h3>
+      <p class="course-subtitle">Intermediate Level</p>
+      <ul class="course-features">
+        <li>✅ 650 Kanji Characters</li>
+        <li>✅ Advanced Grammar</li>
+        <li>✅ Business Japanese</li>
+        <li>✅ Mock Tests</li>
+        <li>✅ 5 Months Duration</li>
+      </ul>
+      <div class="course-price">
+        <span class="price">৳ 5,500</span>
+        <span class="price-period">/month</span>
+      </div>
+      <a href="contact.html" class="course-btn">Enroll Now</a>
+    </div>
+
+    <div class="course-card level-n2">
+      <div class="course-badge">N2</div>
+      <div class="course-icon">🎋</div>
+      <h3>JLPT N2</h3>
+      <p class="course-subtitle">Upper-Intermediate</p>
+      <ul class="course-features">
+        <li>✅ 1000 Kanji Characters</li>
+        <li>✅ Complex Grammar</li>
+        <li>✅ Japanese Media</li>
+        <li>✅ Full Mock Exams</li>
+        <li>✅ 6 Months Duration</li>
+      </ul>
+      <div class="course-price">
+        <span class="price">৳ 6,500</span>
+        <span class="price-period">/month</span>
+      </div>
+      <a href="contact.html" class="course-btn">Enroll Now</a>
+    </div>
+
+    <div class="course-card level-n1">
+      <div class="course-badge">N1</div>
+      <div class="course-icon">🏆</div>
+      <h3>JLPT N1</h3>
+      <p class="course-subtitle">Advanced Level</p>
+      <ul class="course-features">
+        <li>✅ 2000+ Kanji</li>
+        <li>✅ Native Level Grammar</li>
+        <li>✅ Academic Japanese</li>
+        <li>✅ Exam Guarantee</li>
+        <li>✅ 8 Months Duration</li>
+      </ul>
+      <div class="course-price">
+        <span class="price">৳ 8,500</span>
+        <span class="price-period">/month</span>
+      </div>
+      <a href="contact.html" class="course-btn">Enroll Now</a>
+    </div>
+
+    <div class="course-card level-special">
+      <div class="course-badge">PRO</div>
+      <div class="course-icon">✈️</div>
+      <h3>Japan Work Visa</h3>
+      <p class="course-subtitle">Special Program</p>
+      <ul class="course-features">
+        <li>✅ Work Visa Preparation</li>
+        <li>✅ Interview Training</li>
+        <li>✅ Cultural Training</li>
+        <li>✅ Job Placement Help</li>
+        <li>✅ 6 Months Duration</li>
+      </ul>
+      <div class="course-price">
+        <span class="price">৳ 10,000</span>
+        <span class="price-period">/month</span>
+      </div>
+      <a href="contact.html" class="course-btn">Enroll Now</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-content">
+    <p class="footer-copy">© 2026 FasTrack Japanese Language Centre. All Rights Reserved.</p>
+    <p class="footer-dev">Developed by <span class="dev-name">Foisal</span> 💻</p>
+  </div>
+</footer>
+
+<script src="animation.js"></script>
+<script>
+// COURSES PAGE - Anime Academy 5D Scene
+const canvas = document.getElementById('canvas5d');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+let frame = 0;
+let mx = 0, my = 0;
+document.addEventListener('mousemove', e => {
+  mx = (e.clientX/window.innerWidth - 0.5);
+  my = (e.clientY/window.innerHeight - 0.5);
+});
+
+// Torii gates in 3D perspective
+const toriiGates = [
+  {x: 0.2, scale: 0.3, z: 800},
+  {x: 0.4, scale: 0.5, z: 500},
+  {x: 0.6, scale: 0.7, z: 300},
+  {x: 0.8, scale: 0.9, z: 150},
+];
+
+function drawToriiGate(ctx, cx, cy, scale, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = `rgba(220,50,50,${alpha})`;
+  ctx.fillStyle = `rgba(180,30,30,${alpha})`;
+  ctx.lineWidth = 4 * scale;
+  
+  const w = 120 * scale;
+  const h = 100 * scale;
+  
+  // Top beam
+  ctx.fillRect(cx - w*0.6, cy - h, w*1.2, h*0.12);
+  // Mid beam
+  ctx.fillRect(cx - w*0.5, cy - h*0.6, w, h*0.1);
+  // Pillars
+  ctx.fillRect(cx - w*0.5, cy - h*0.5, w*0.1, h*0.5);
+  ctx.fillRect(cx + w*0.4, cy - h*0.5, w*0.1, h*0.5);
+  
+  ctx.restore();
+}
+
+function animateCourses() {
+  frame++;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  // Background
+  const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  bg.addColorStop(0, '#0f0020');
+  bg.addColorStop(0.5, '#1a0035');
+  bg.addColorStop(1, '#0a0010');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Grid floor (5D perspective)
+  ctx.save();
+  ctx.strokeStyle = 'rgba(220,50,50,0.15)';
+  ctx.lineWidth = 1;
+  const vp = {x: canvas.width/2 + mx*100, y: canvas.height*0.6};
+  
+  for(let i = -10; i <= 10; i++) {
+    ctx.beginPath();
+    ctx.moveTo(vp.x + i*60, canvas.height);
+    ctx.lineTo(vp.x, vp.y);
+    ctx.stroke();
+  }
+  for(let j = 0; j < 8; j++) {
+    const y = vp.y + j * (canvas.height - vp.y) / 8;
+    const spread = (y - vp.y) / (canvas.height - vp.y) * 600;
+    ctx.beginPath();
+    ctx.moveTo(vp.x - spread, y);
+    ctx.lineTo(vp.x + spread, y);
+    ctx.stroke();
+  }
+  ctx.restore();
+  
+  // Draw torii gates in perspective
+  toriiGates.forEach((gate, i) => {
+    const parallax = (1000 - gate.z) / 1000;
+    const cx = canvas.width * gate.x + mx * gate.z * 0.05;
+    const cy = canvas.height * 0.65 - parallax * 50;
+    const alpha = parallax * 0.6;
+    drawToriiGate(ctx, cx, cy, gate.scale, alpha);
+  });
+  
+  // Falling Kanji
+  if(!window.kanjiParticles) {
+    window.kanjiParticles = [];
+    const chars = ['日','本','語','学','習','文','化','読','書','会'];
+    for(let k = 0; k < 30; k++) {
+      window.kanjiParticles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        char: chars[Math.floor(Math.random()*chars.length)],
+        speed: Math.random() * 1 + 0.3,
+        size: Math.random() * 30 + 15,
+        alpha: Math.random() * 0.3 + 0.05,
+        drift: (Math.random()-0.5) * 0.5
+      });
+    }
+  }
+  
+  window.kanjiParticles.forEach(k => {
+    k.y += k.speed;
+    k.x += k.drift;
+    if(k.y > canvas.height + 50) {
+      k.y = -50;
+      k.x = Math.random() * canvas.width;
+    }
+    ctx.font = `${k.size}px serif`;
+    ctx.fillStyle = `rgba(255,100,100,${k.alpha})`;
+    ctx.fillText(k.char, k.x, k.y);
+  });
+  
+  requestAnimationFrame(animateCourses);
+}
+animateCourses();
+</script>
 </body>
 </html>

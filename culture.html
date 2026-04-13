@@ -1,151 +1,306 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Japanese Culture | FasTrack</title>
-    <style>
-        body { margin:0; overflow:hidden; font-family:'Segoe UI','Noto Sans JP',sans-serif; color:white; }
-        #canvas-container { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; }
-        .content { position:relative; z-index:10; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(0,0,0,0.2); backdrop-filter:blur(3px); padding:20px; }
-        nav { position:absolute; top:20px; left:0; right:0; display:flex; justify-content:center; gap:20px; z-index:20; }
-        nav a { color:#fff; text-decoration:none; font-weight:bold; font-size:1.1rem; text-shadow:0 0 10px black; padding:8px 16px; border-radius:30px; background:rgba(255,255,255,0.15); backdrop-filter:blur(5px); }
-        nav a:hover { background:#d6336c; }
-        .culture-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; max-width:1000px; margin:40px; }
-        .culture-item { background:rgba(30,20,40,0.7); backdrop-filter:blur(8px); border-radius:20px; padding:20px; text-align:center; border:1px solid #ffb3c6; }
-        h1 { font-size:3rem; text-shadow:0 0 20px #ff99cc; }
-        footer { position:absolute; bottom:10px; left:0; right:0; text-align:center; z-index:20; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Japanese Culture - FasTrack</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700;900&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div id="canvas-container"></div>
-    <nav>
-        <a href="index.html">🏠 Home</a>
-        <a href="about.html">👥 About</a>
-        <a href="courses.html">📚 Courses</a>
-        <a href="culture.html">🎎 Culture</a>
-        <a href="contact.html">📞 Contact</a>
-    </nav>
-    <div class="content">
-        <h1>Discover Japanese Culture</h1>
-        <div class="culture-grid">
-            <div class="culture-item"><h3>🍵 Tea Ceremony</h3><p>The art of preparing matcha.</p></div>
-            <div class="culture-item"><h3>🎋 Tanabata</h3><p>Star festival with wishes.</p></div>
-            <div class="culture-item"><h3>👘 Kimono</h3><p>Traditional attire.</p></div>
-            <div class="culture-item"><h3>🏯 Castles</h3><p>Historic architecture.</p></div>
-            <div class="culture-item"><h3>🎎 Hinamatsuri</h3><p>Doll Festival.</p></div>
-            <div class="culture-item"><h3>🍣 Sushi</h3><p>Culinary art.</p></div>
-        </div>
-    </div>
-    <footer>© 2026 FasTrack Japanese Language Centre | Developed by Foisal</footer>
 
-    <script type="importmap">
-        {"imports": {"three": "https://unpkg.com/three@0.128.0/build/three.module.js"}}
-    </script>
-    <script type="module">
-        import * as THREE from 'three';
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x87CEEB);
-        scene.fog = new THREE.Fog(0x87CEEB, 20, 50);
-        const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
-        camera.position.set(0, 6, 18);
-        const renderer = new THREE.WebGLRenderer({antialias:true});
-        renderer.setSize(innerWidth, innerHeight);
-        renderer.shadowMap.enabled = true;
-        document.getElementById('canvas-container').appendChild(renderer.domElement);
-        
-        // Lights
-        scene.add(new THREE.AmbientLight(0x404060));
-        const sun = new THREE.DirectionalLight(0xfff5d1, 1.2);
-        sun.position.set(10, 20, 5);
-        sun.castShadow = true;
-        sun.shadow.mapSize.width = 1024;
-        sun.shadow.mapSize.height = 1024;
-        scene.add(sun);
-        
-        // Mount Fuji
-        const mountainGroup = new THREE.Group();
-        const baseMat = new THREE.MeshStandardMaterial({ color: 0x6d7a85, roughness: 0.8 });
-        const snowMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4, emissive: new THREE.Color(0x446688) });
-        
-        const base = new THREE.Mesh(new THREE.ConeGeometry(4, 5, 32), baseMat);
-        base.position.y = 2.5;
-        base.receiveShadow = true;
-        base.castShadow = true;
-        mountainGroup.add(base);
-        
-        const snowCap = new THREE.Mesh(new THREE.ConeGeometry(2.2, 1.8, 32), snowMat);
-        snowCap.position.y = 5.4;
-        snowCap.receiveShadow = true;
-        snowCap.castShadow = true;
-        mountainGroup.add(snowCap);
-        
-        mountainGroup.position.set(-1, 0, -3);
-        scene.add(mountainGroup);
-        
-        // Clouds (particles)
-        const cloudGeo = new THREE.SphereGeometry(1.5, 7, 7);
-        const cloudMat = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.6, emissive: new THREE.Color(0xccccdd) });
-        const cloudPositions = [[-3,4,2],[4,5,-1],[-2,6,-3],[5,3,3]];
-        cloudPositions.forEach(pos => {
-            const cloud = new THREE.Mesh(cloudGeo, cloudMat);
-            cloud.position.set(pos[0], pos[1], pos[2]);
-            cloud.scale.set(1.2,0.6,0.8);
-            cloud.castShadow = true;
-            scene.add(cloud);
-        });
-        
-        // Ground plane with texture
-        const ground = new THREE.Mesh(new THREE.CircleGeometry(30, 20), new THREE.MeshStandardMaterial({ color: 0x3a5f3a, roughness:0.9 }));
-        ground.rotation.x = -Math.PI/2;
-        ground.position.y = -0.1;
-        ground.receiveShadow = true;
-        scene.add(ground);
-        
-        // Cherry trees
-        function addTree(x,z){
-            const g = new THREE.Group();
-            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.6,2.5), new THREE.MeshStandardMaterial({color:0x6b4e3a}));
-            trunk.position.y=1.25;
-            trunk.castShadow=true; trunk.receiveShadow=true;
-            g.add(trunk);
-            const leaf = new THREE.Mesh(new THREE.SphereGeometry(1.2), new THREE.MeshStandardMaterial({color:0xffaacc}));
-            leaf.position.y=2.8;
-            leaf.castShadow=true;
-            g.add(leaf);
-            g.position.set(x,0,z);
-            scene.add(g);
-        }
-        addTree(-5,2); addTree(5,1); addTree(-3,-4); addTree(4,-3);
-        
-        // Floating petals
-        const petalCount = 400;
-        const petalGeo = new THREE.BufferGeometry();
-        const pos = new Float32Array(petalCount*3);
-        for(let i=0;i<petalCount*3;i+=3){
-            pos[i] = (Math.random()-0.5)*30;
-            pos[i+1] = Math.random()*10;
-            pos[i+2] = (Math.random()-0.5)*30;
-        }
-        petalGeo.setAttribute('position', new THREE.BufferAttribute(pos,3));
-        const petalMat = new THREE.PointsMaterial({color:0xffb7c5, size:0.15});
-        const petals = new THREE.Points(petalGeo, petalMat);
-        scene.add(petals);
-        
-        let clock = new THREE.Clock();
-        function animate(){
-            requestAnimationFrame(animate);
-            const t = performance.now()*0.001;
-            petals.rotation.y += 0.002;
-            renderer.render(scene, camera);
-        }
-        animate();
-        
-        window.addEventListener('resize', ()=>{
-            camera.aspect = innerWidth/innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(innerWidth, innerHeight);
-        });
-    </script>
+<nav class="navbar" id="navbar">
+  <div class="nav-logo">
+    <span class="logo-jp">日本語</span>
+    <span class="logo-text">FasTrack</span>
+  </div>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="courses.html">Courses</a></li>
+    <li><a href="culture.html" class="active">Culture</a></li>
+    <li><a href="team.html">Team</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+</nav>
+
+<canvas id="canvas5d"></canvas>
+
+<section class="page-hero culture-hero">
+  <div class="page-hero-content">
+    <div class="page-badge">🌸 Japanese Culture</div>
+    <h1 class="page-title">
+      <span class="jp-title">日本文化</span>
+      <span class="en-title">Experience Japan</span>
+    </h1>
+    <p>Immerse yourself in the beauty of Japanese traditions</p>
+  </div>
+</section>
+
+<section class="culture-section">
+  <div class="section-header">
+    <h2>Japanese Culture & Traditions</h2>
+    <p>Explore the multidimensional world of Japan</p>
+  </div>
+
+  <div class="culture-grid">
+    <div class="culture-card sakura-card">
+      <div class="culture-bg-icon">🌸</div>
+      <div class="culture-icon-main">🌸</div>
+      <h3>Sakura Festival</h3>
+      <p class="culture-jp">花見 (Hanami)</p>
+      <p>Experience the magical cherry blossom viewing tradition. Sakura represents the beauty and fragility of life in Japanese culture.</p>
+      <div class="culture-tags">
+        <span class="tag">Spring</span>
+        <span class="tag">Nature</span>
+        <span class="tag">Tradition</span>
+      </div>
+    </div>
+
+    <div class="culture-card tea-card">
+      <div class="culture-bg-icon">🍵</div>
+      <div class="culture-icon-main">🍵</div>
+      <h3>Tea Ceremony</h3>
+      <p class="culture-jp">茶道 (Sadō)</p>
+      <p>The Way of Tea — a meditative practice that emphasizes aesthetics, mindfulness and harmony through the preparation of matcha.</p>
+      <div class="culture-tags">
+        <span class="tag">Zen</span>
+        <span class="tag">Ritual</span>
+        <span class="tag">Art</span>
+      </div>
+    </div>
+
+    <div class="culture-card sumo-card">
+      <div class="culture-bg-icon">🥋</div>
+      <div class="culture-icon-main">🥋</div>
+      <h3>Martial Arts</h3>
+      <p class="culture-jp">武道 (Budō)</p>
+      <p>Judo, Karate, Kendo and Aikido — Japan's martial arts traditions that build discipline, respect and inner strength.</p>
+      <div class="culture-tags">
+        <span class="tag">Sport</span>
+        <span class="tag">Discipline</span>
+        <span class="tag">Honor</span>
+      </div>
+    </div>
+
+    <div class="culture-card anime-card">
+      <div class="culture-bg-icon">🎌</div>
+      <div class="culture-icon-main">🎌</div>
+      <h3>Anime & Manga</h3>
+      <p class="culture-jp">アニメと漫画</p>
+      <p>Japanese animation and comics that have conquered the world. A powerful medium for storytelling and artistic expression.</p>
+      <div class="culture-tags">
+        <span class="tag">Animation</span>
+        <span class="tag">Art</span>
+        <span class="tag">Pop Culture</span>
+      </div>
+    </div>
+
+    <div class="culture-card food-card">
+      <div class="culture-bg-icon">🍜</div>
+      <div class="culture-icon-main">🍜</div>
+      <h3>Japanese Cuisine</h3>
+      <p class="culture-jp">日本料理</p>
+      <p>Sushi, Ramen, Tempura and more — Japanese cuisine is a UNESCO Intangible Cultural Heritage known for precision and freshness.</p>
+      <div class="culture-tags">
+        <span class="tag">Food</span>
+        <span class="tag">UNESCO</span>
+        <span class="tag">Health</span>
+      </div>
+    </div>
+
+    <div class="culture-card festival-card">
+      <div class="culture-bg-icon">🎆</div>
+      <div class="culture-icon-main">🎆</div>
+      <h3>Matsuri Festivals</h3>
+      <p class="culture-jp">祭り (Matsuri)</p>
+      <p>Traditional Japanese festivals with colorful fireworks, traditional dances, food stalls and community celebration throughout Japan.</p>
+      <div class="culture-tags">
+        <span class="tag">Festival</span>
+        <span class="tag">Fireworks</span>
+        <span class="tag">Community</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-content">
+    <p class="footer-copy">© 2026 FasTrack Japanese Language Centre. All Rights Reserved.</p>
+    <p class="footer-dev">Developed by <span class="dev-name">Foisal</span> 💻</p>
+  </div>
+</footer>
+
+<script src="animation.js"></script>
+<script>
+// CULTURE PAGE - Cherry Blossom 5D Scene
+const canvas = document.getElementById('canvas5d');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+let frame = 0;
+let mx = 0.5, my = 0.5;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX / window.innerWidth;
+  my = e.clientY / window.innerHeight;
+});
+
+// Cherry blossom petals
+const petals = [];
+for(let i = 0; i < 80; i++) {
+  petals.push({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    size: Math.random() * 12 + 4,
+    speedY: Math.random() * 1.5 + 0.5,
+    speedX: (Math.random() - 0.5) * 1.5,
+    rotation: Math.random() * Math.PI * 2,
+    rotSpeed: (Math.random() - 0.5) * 0.05,
+    alpha: Math.random() * 0.7 + 0.2,
+    color: `hsl(${Math.random()*30+340}, 80%, ${Math.random()*20+70}%)`
+  });
+}
+
+// Fireflies
+const fireflies = [];
+for(let i = 0; i < 40; i++) {
+  fireflies.push({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    vx: (Math.random()-0.5) * 1,
+    vy: (Math.random()-0.5) * 1,
+    size: Math.random() * 4 + 1,
+    phase: Math.random() * Math.PI * 2,
+    speed: Math.random() * 0.05 + 0.02
+  });
+}
+
+function drawPetal(ctx, x, y, size, rotation, alpha, color) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rotation);
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, size, size/2, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function animateCulture() {
+  frame++;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  // Gradient background - twilight Japan
+  const bg = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  bg.addColorStop(0, `hsl(${280 + mx*20}, 60%, ${5 + my*8}%)`);
+  bg.addColorStop(0.4, `hsl(${310 + mx*20}, 50%, ${8 + my*5}%)`);
+  bg.addColorStop(0.7, `hsl(${330}, 40%, 10%)`);
+  bg.addColorStop(1, '#050010');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Moon
+  const moonX = canvas.width * (0.7 + mx * 0.1);
+  const moonY = canvas.height * (0.2 - my * 0.1);
+  const moonGlow = ctx.createRadialGradient(moonX, moonY, 0, moonX, moonY, 100);
+  moonGlow.addColorStop(0, 'rgba(255,240,200,0.9)');
+  moonGlow.addColorStop(0.3, 'rgba(255,220,150,0.3)');
+  moonGlow.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = moonGlow;
+  ctx.beginPath();
+  ctx.arc(moonX, moonY, 100, 0, Math.PI*2);
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.arc(moonX, moonY, 35, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(255,245,200,0.95)';
+  ctx.fill();
+  
+  // Cherry tree silhouette
+  const treeX = canvas.width * 0.15;
+  const treeY = canvas.height * 0.75;
+  
+  // Draw tree
+  ctx.strokeStyle = 'rgba(50,20,10,0.8)';
+  ctx.lineWidth = 8;
+  ctx.lineCap = 'round';
+  
+  function drawBranch(x, y, angle, length, depth) {
+    if(depth === 0) return;
+    const ex = x + Math.cos(angle) * length;
+    const ey = y + Math.sin(angle) * length;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(ex, ey);
+    ctx.lineWidth = depth * 2;
+    ctx.stroke();
+    if(depth > 2) {
+      drawBranch(ex, ey, angle - 0.4, length * 0.7, depth - 1);
+      drawBranch(ex, ey, angle + 0.3, length * 0.6, depth - 1);
+    }
+    // Blossoms at tips
+    if(depth <= 2) {
+      ctx.beginPath();
+      ctx.arc(ex, ey, Math.random() * 15 + 5, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(255,150,180,${0.4 + Math.random()*0.3})`;
+      ctx.fill();
+    }
+  }
+  
+  drawBranch(treeX, treeY, -Math.PI/2, 80, 6);
+  
+  // Falling petals
+  petals.forEach(p => {
+    p.y += p.speedY;
+    p.x += p.speedX + Math.sin(frame * 0.02 + p.x) * 0.3;
+    p.rotation += p.rotSpeed;
+    
+    if(p.y > canvas.height + 20) {
+      p.y = -20;
+      p.x = Math.random() * canvas.width;
+    }
+    
+    drawPetal(ctx, p.x, p.y, p.size, p.rotation, p.alpha, p.color);
+  });
+  
+  // Fireflies
+  fireflies.forEach(f => {
+    f.phase += f.speed;
+    f.x += f.vx + Math.sin(f.phase) * 0.5;
+    f.y += f.vy + Math.cos(f.phase * 0.7) * 0.5;
+    
+    if(f.x < 0) f.x = canvas.width;
+    if(f.x > canvas.width) f.x = 0;
+    if(f.y < 0) f.y = canvas.height;
+    if(f.y > canvas.height) f.y = 0;
+    
+    const glowAlpha = (Math.sin(f.phase * 3) + 1) / 2;
+    const glow = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.size * 8);
+    glow.addColorStop(0, `rgba(180,255,100,${glowAlpha * 0.9})`);
+    glow.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(f.x, f.y, f.size * 8, 0, Math.PI*2);
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.arc(f.x, f.y, f.size, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(200,255,150,${glowAlpha})`;
+    ctx.fill();
+  });
+  
+  requestAnimationFrame(animateCulture);
+}
+animateCulture();
+</script>
 </body>
 </html>
