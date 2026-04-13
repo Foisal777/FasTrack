@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FasTrack Japanese Language Centre | Home</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', 'Noto Sans JP', sans-serif;
+            color: white;
+        }
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        .content {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(2px);
+            padding: 20px;
+        }
+        nav {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            z-index: 20;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-shadow: 0 0 10px rgba(0,0,0,0.7);
+            padding: 8px 16px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            transition: 0.3s;
+        }
+        nav a:hover {
+            background: rgba(255, 100, 150, 0.6);
+            box-shadow: 0 0 20px #ff99cc;
+        }
+        h1 {
+            font-size: 4.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px #ff4d6d;
+            letter-spacing: 4px;
+        }
+        .subtitle {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            text-shadow: 0 0 15px black;
+        }
+        .btn {
+            background: #d6336c;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 25px #ff7eb3;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+            background: #c2255c;
+        }
+        footer {
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #eee;
+            z-index: 20;
+            font-size: 0.9rem;
+            text-shadow: 0 0 5px black;
+        }
+        @media (max-width: 768px) {
+            h1 { font-size: 2.8rem; }
+            .subtitle { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    <nav>
+        <a href="index.html">🏠 Home</a>
+        <a href="about.html">👥 About</a>
+        <a href="courses.html">📚 Courses</a>
+        <a href="culture.html">🎎 Culture</a>
+        <a href="contact.html">📞 Contact</a>
+    </nav>
+    <div class="content">
+        <h1>FasTrack</h1>
+        <div class="subtitle">日本語センター | Japanese Language Centre</div>
+        <p style="max-width:700px; font-size:1.3rem; margin-bottom:30px;">Embark on a 5D journey through Japanese language & culture</p>
+        <a href="courses.html" class="btn">Explore Courses →</a>
+    </div>
+    <footer>
+        © 2026 FasTrack Japanese Language Centre | Developed by Foisal
+    </footer>
+
+    <!-- Three.js Libraries -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+        // --- Setup Scene, Camera, Renderers ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a1030); // deep night sky
+        scene.fog = new THREE.FogExp2(0x0a1030, 0.002);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 5, 20);
+        camera.lookAt(0, 2, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+
+        // CSS2 Renderer for labels (optional, not used here)
+        const labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        labelRenderer.domElement.style.position = 'absolute';
+        labelRenderer.domElement.style.top = '0px';
+        labelRenderer.domElement.style.left = '0px';
+        labelRenderer.domElement.style.pointerEvents = 'none';  // allow clicks through
+        container.appendChild(labelRenderer.domElement);
+
+        // Controls (disabled autoRotate to keep camera fixed, but we'll rotate objects)
+        // const controls = new OrbitControls(camera, renderer.domElement);
+        // controls.enableDamping = true;
+        // controls.enableZoom = false;
+        // controls.autoRotate = false;
+
+        // --- Lighting ---
+        const ambientLight = new THREE.AmbientLight(0x404060);
+        scene.add(ambientLight);
+        
+        const dirLight = new THREE.DirectionalLight(0xffeedd, 1);
+        dirLight.position.set(5, 15, 10);
+        dirLight.castShadow = true;
+        dirLight.receiveShadow = true;
+        dirLight.shadow.mapSize.width = 1024;
+        dirLight.shadow.mapSize.height = 1024;
+        const d = 20;
+        dirLight.shadow.camera.left = -d;
+        dirLight.shadow.camera.right = d;
+        dirLight.shadow.camera.top = d;
+        dirLight.shadow.camera.bottom = -d;
+        dirLight.shadow.camera.near = 1;
+        dirLight.shadow.camera.far = 50;
+        dirLight.shadow.bias = -0.001;
+        scene.add(dirLight);
+        
+        const backLight = new THREE.PointLight(0x4466ff, 0.8);
+        backLight.position.set(-5, 3, -5);
+        scene.add(backLight);
+        
+        const fillLight = new THREE.PointLight(0xffaa88, 0.5);
+        fillLight.position.set(-2, 4, 10);
+        scene.add(fillLight);
+
+        // --- Ground Plane (invisible but receives shadow) ---
+        const planeGeometry = new THREE.CircleGeometry(30, 32);
+        const planeMaterial = new THREE.MeshStandardMaterial({ color: 0x2a1e3c, transparent: true, opacity: 0.3, side: THREE.DoubleSide });
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.rotation.x = -Math.PI / 2;
+        plane.position.y = -0.01;
+        plane.receiveShadow = true;
+        scene.add(plane);
+
+        // Decorative grid
+        const gridHelper = new THREE.GridHelper(40, 20, 0xff99cc, 0x443366);
+        gridHelper.position.y = 0;
+        scene.add(gridHelper);
+
+        // --- Torii Gate (Japanese cultural icon) ---
+        function createTorii() {
+            const group = new THREE.Group();
+            const woodColor = 0xc94f4f;
+            const darkWood = 0x8b2a2a;
+            
+            // Top beam (kasagi)
+            const topBeam = new THREE.Mesh(
+                new THREE.BoxGeometry(6, 0.5, 1.2),
+                new THREE.MeshStandardMaterial({ color: woodColor, roughness: 0.6 })
+            );
+            topBeam.position.y = 5;
+            topBeam.castShadow = true;
+            topBeam.receiveShadow = true;
+            group.add(topBeam);
+            
+            // Second beam (nuki)
+            const secondBeam = new THREE.Mesh(
+                new THREE.BoxGeometry(5.6, 0.4, 0.8),
+                new THREE.MeshStandardMaterial({ color: darkWood, roughness: 0.7 })
+            );
+            secondBeam.position.y = 4.2;
+            secondBeam.castShadow = true;
+            secondBeam.receiveShadow = true;
+            group.add(secondBeam);
+            
+            // Left pillar
+            const leftPillar = new THREE.Mesh(
+                new THREE.BoxGeometry(0.8, 5.5, 0.8),
+                new THREE.MeshStandardMaterial({ color: woodColor, roughness: 0.5 })
+            );
+            leftPillar.position.set(-2.8, 2.75, 0);
+            leftPillar.castShadow = true;
+            leftPillar.receiveShadow = true;
+            group.add(leftPillar);
+            
+            // Right pillar
+            const rightPillar = new THREE.Mesh(
+                new THREE.BoxGeometry(0.8, 5.5, 0.8),
+                new THREE.MeshStandardMaterial({ color: woodColor, roughness: 0.5 })
+            );
+            rightPillar.position.set(2.8, 2.75, 0);
+            rightPillar.castShadow = true;
+            rightPillar.receiveShadow = true;
+            group.add(rightPillar);
+            
+            // Small center piece (gaku-zuka)
+            const centerPiece = new THREE.Mesh(
+                new THREE.BoxGeometry(1.5, 0.4, 0.4),
+                new THREE.MeshStandardMaterial({ color: 0xbd7e5a })
+            );
+            centerPiece.position.y = 4.6;
+            centerPiece.castShadow = true;
+            group.add(centerPiece);
+            
+            return group;
+        }
+
+        const torii = createTorii();
+        torii.position.set(0, 0.5, -2);
+        torii.scale.set(1.2, 1.2, 1.2);
+        scene.add(torii);
+
+        // --- Cherry Blossom Tree (Sakura) ---
+        function createSakuraTree() {
+            const group = new THREE.Group();
+            
+            // Trunk
+            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x6b4e3a, roughness: 0.9 });
+            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.2, 4), trunkMat);
+            trunk.position.y = 2;
+            trunk.castShadow = true;
+            trunk.receiveShadow = true;
+            group.add(trunk);
+            
+            // Branches (simple cylinders)
+            const branchMat = new THREE.MeshStandardMaterial({ color: 0x8b5e3c });
+            const branch1 = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.5, 2.5), branchMat);
+            branch1.position.set(1.0, 3.5, 0.2);
+            branch1.rotation.z = 0.4;
+            branch1.rotation.x = 0.2;
+            branch1.castShadow = true;
+            group.add(branch1);
+            
+            const branch2 = branch1.clone();
+            branch2.position.set(-1.0, 3.8, -0.3);
+            branch2.rotation.z = -0.5;
+            branch2.rotation.x = -0.1;
+            group.add(branch2);
+            
+            const branch3 = branch1.clone();
+            branch3.position.set(0.3, 4.5, 0.8);
+            branch3.rotation.z = 0.2;
+            branch3.rotation.x = 0.5;
+            group.add(branch3);
+            
+            // Flower clusters (spheres with pink material)
+            const flowerMat = new THREE.MeshStandardMaterial({ 
+                color: 0xffaacc, 
+                emissive: new THREE.Color(0x552233),
+                roughness: 0.3,
+                transparent: true,
+                opacity: 0.9
+            });
+            
+            const positions = [
+                [1.2, 4.0, 0.5], [-0.8, 4.5, -0.2], [0.5, 5.0, 0.8], [-1.3, 4.2, 0.3],
+                [1.5, 3.8, -0.7], [-1.0, 5.0, -0.8], [0.0, 5.5, 0.0], [0.8, 4.8, -0.9]
+            ];
+            
+            positions.forEach(pos => {
+                const flower = new THREE.Mesh(new THREE.SphereGeometry(0.4, 8), flowerMat);
+                flower.position.set(pos[0], pos[1], pos[2]);
+                flower.castShadow = true;
+                group.add(flower);
+            });
+            
+            return group;
+        }
+
+        const sakura = createSakuraTree();
+        sakura.position.set(-3, 0.5, 2);
+        sakura.scale.set(1.1, 1.1, 1.1);
+        scene.add(sakura);
+
+        // Second smaller tree
+        const sakura2 = createSakuraTree();
+        sakura2.position.set(4, 0.5, 3.5);
+        sakura2.scale.set(0.9, 0.9, 0.9);
+        scene.add(sakura2);
+
+        // --- Floating Petals Particle System (5D feel) ---
+        const petalCount = 800;
+        const petalGeometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(petalCount * 3);
+        const colors = new Float32Array(petalCount * 3);
+        
+        const pink1 = new THREE.Color(0xffb7c5);
+        const pink2 = new THREE.Color(0xff8da1);
+        const white = new THREE.Color(0xfff0f5);
+        
+        for (let i = 0; i < petalCount; i++) {
+            // Random positions in a cylinder
+            const r = 8 + Math.random() * 10;
+            const theta = Math.random() * Math.PI * 2;
+            const x = Math.cos(theta) * r;
+            const z = Math.sin(theta) * r;
+            const y = Math.random() * 12 - 2;
+            
+            positions[i*3] = x;
+            positions[i*3+1] = y;
+            positions[i*3+2] = z;
+            
+            // Colors
+            let color;
+            if (Math.random() < 0.6) color = pink1;
+            else if (Math.random() < 0.8) color = pink2;
+            else color = white;
+            
+            colors[i*3] = color.r;
+            colors[i*3+1] = color.g;
+            colors[i*3+2] = color.b;
+        }
+        
+        petalGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        petalGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        
+        // Create texture for petal shape (simple canvas circle)
+        const canvas = document.createElement('canvas');
+        canvas.width = 32;
+        canvas.height = 32;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.ellipse(16, 16, 14, 8, 0, 0, Math.PI*2);
+        ctx.fill();
+        ctx.strokeStyle = '#ff99bb';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        
+        const petalTexture = new THREE.CanvasTexture(canvas);
+        
+        const petalMaterial = new THREE.PointsMaterial({
+            size: 0.25,
+            map: petalTexture,
+            vertexColors: true,
+            transparent: true,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending
+        });
+        
+        const petals = new THREE.Points(petalGeometry, petalMaterial);
+        scene.add(petals);
+
+        // Add some floating glowing orbs (lanterns)
+        const lanternGroup = new THREE.Group();
+        for (let i = 0; i < 6; i++) {
+            const lanternMat = new THREE.MeshStandardMaterial({ 
+                color: 0xffaa33, 
+                emissive: new THREE.Color(0xff5500), 
+                transparent: true, 
+                opacity: 0.7 
+            });
+            const lantern = new THREE.Mesh(new THREE.SphereGeometry(0.4), lanternMat);
+            lantern.position.set(Math.sin(i)*3, 2 + i*1.5, Math.cos(i*1.3)*4);
+            lantern.castShadow = true;
+            lanternGroup.add(lantern);
+        }
+        scene.add(lanternGroup);
+
+        // --- Animation Loop ---
+        let clock = new THREE.Clock();
+        
+        function animate() {
+            const delta = clock.getDelta();
+            const elapsedTime = performance.now() * 0.001; // seconds
+            
+            // Rotate torii slowly
+            torii.rotation.y = Math.sin(elapsedTime * 0.1) * 0.1;
+            
+            // Animate petals (swirling motion)
+            const positionsAttr = petals.geometry.attributes.position;
+            const posArray = positionsAttr.array;
+            for (let i = 0; i < petalCount; i++) {
+                const i3 = i * 3;
+                // Simple rotation around Y axis
+                const x = posArray[i3];
+                const z = posArray[i3+2];
+                const angle = elapsedTime * 0.05;
+                const newX = x * Math.cos(angle) - z * Math.sin(angle);
+                const newZ = x * Math.sin(angle) + z * Math.cos(angle);
+                posArray[i3] = newX;
+                posArray[i3+2] = newZ;
+                
+                // Gentle floating up/down
+                posArray[i3+1] += Math.sin(elapsedTime * 2 + i) * 0.002;
+                if (posArray[i3+1] > 12) posArray[i3+1] = -2;
+                if (posArray[i3+1] < -2) posArray[i3+1] = 12;
+            }
+            positionsAttr.needsUpdate = true;
+            
+            // Rotate lantern group
+            lanternGroup.rotation.y += 0.002;
+            
+            // Slight camera movement (parallax)
+            camera.position.x = Math.sin(elapsedTime * 0.05) * 2;
+            camera.lookAt(0, 3, 0);
+            
+            renderer.render(scene, camera);
+            labelRenderer.render(scene, camera);
+            
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+
+        // --- Handle Window Resize ---
+        window.addEventListener('resize', onWindowResize, false);
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        }
+    </script>
+</body>
+</html>

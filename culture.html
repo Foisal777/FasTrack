@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japanese Culture | FasTrack</title>
+    <style>
+        body { margin:0; overflow:hidden; font-family:'Segoe UI','Noto Sans JP',sans-serif; color:white; }
+        #canvas-container { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; }
+        .content { position:relative; z-index:10; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(0,0,0,0.2); backdrop-filter:blur(3px); padding:20px; }
+        nav { position:absolute; top:20px; left:0; right:0; display:flex; justify-content:center; gap:20px; z-index:20; }
+        nav a { color:#fff; text-decoration:none; font-weight:bold; font-size:1.1rem; text-shadow:0 0 10px black; padding:8px 16px; border-radius:30px; background:rgba(255,255,255,0.15); backdrop-filter:blur(5px); }
+        nav a:hover { background:#d6336c; }
+        .culture-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; max-width:1000px; margin:40px; }
+        .culture-item { background:rgba(30,20,40,0.7); backdrop-filter:blur(8px); border-radius:20px; padding:20px; text-align:center; border:1px solid #ffb3c6; }
+        h1 { font-size:3rem; text-shadow:0 0 20px #ff99cc; }
+        footer { position:absolute; bottom:10px; left:0; right:0; text-align:center; z-index:20; }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    <nav>
+        <a href="index.html">🏠 Home</a>
+        <a href="about.html">👥 About</a>
+        <a href="courses.html">📚 Courses</a>
+        <a href="culture.html">🎎 Culture</a>
+        <a href="contact.html">📞 Contact</a>
+    </nav>
+    <div class="content">
+        <h1>Discover Japanese Culture</h1>
+        <div class="culture-grid">
+            <div class="culture-item"><h3>🍵 Tea Ceremony</h3><p>The art of preparing matcha.</p></div>
+            <div class="culture-item"><h3>🎋 Tanabata</h3><p>Star festival with wishes.</p></div>
+            <div class="culture-item"><h3>👘 Kimono</h3><p>Traditional attire.</p></div>
+            <div class="culture-item"><h3>🏯 Castles</h3><p>Historic architecture.</p></div>
+            <div class="culture-item"><h3>🎎 Hinamatsuri</h3><p>Doll Festival.</p></div>
+            <div class="culture-item"><h3>🍣 Sushi</h3><p>Culinary art.</p></div>
+        </div>
+    </div>
+    <footer>© 2026 FasTrack Japanese Language Centre | Developed by Foisal</footer>
+
+    <script type="importmap">
+        {"imports": {"three": "https://unpkg.com/three@0.128.0/build/three.module.js"}}
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87CEEB);
+        scene.fog = new THREE.Fog(0x87CEEB, 20, 50);
+        const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
+        camera.position.set(0, 6, 18);
+        const renderer = new THREE.WebGLRenderer({antialias:true});
+        renderer.setSize(innerWidth, innerHeight);
+        renderer.shadowMap.enabled = true;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+        
+        // Lights
+        scene.add(new THREE.AmbientLight(0x404060));
+        const sun = new THREE.DirectionalLight(0xfff5d1, 1.2);
+        sun.position.set(10, 20, 5);
+        sun.castShadow = true;
+        sun.shadow.mapSize.width = 1024;
+        sun.shadow.mapSize.height = 1024;
+        scene.add(sun);
+        
+        // Mount Fuji
+        const mountainGroup = new THREE.Group();
+        const baseMat = new THREE.MeshStandardMaterial({ color: 0x6d7a85, roughness: 0.8 });
+        const snowMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4, emissive: new THREE.Color(0x446688) });
+        
+        const base = new THREE.Mesh(new THREE.ConeGeometry(4, 5, 32), baseMat);
+        base.position.y = 2.5;
+        base.receiveShadow = true;
+        base.castShadow = true;
+        mountainGroup.add(base);
+        
+        const snowCap = new THREE.Mesh(new THREE.ConeGeometry(2.2, 1.8, 32), snowMat);
+        snowCap.position.y = 5.4;
+        snowCap.receiveShadow = true;
+        snowCap.castShadow = true;
+        mountainGroup.add(snowCap);
+        
+        mountainGroup.position.set(-1, 0, -3);
+        scene.add(mountainGroup);
+        
+        // Clouds (particles)
+        const cloudGeo = new THREE.SphereGeometry(1.5, 7, 7);
+        const cloudMat = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.6, emissive: new THREE.Color(0xccccdd) });
+        const cloudPositions = [[-3,4,2],[4,5,-1],[-2,6,-3],[5,3,3]];
+        cloudPositions.forEach(pos => {
+            const cloud = new THREE.Mesh(cloudGeo, cloudMat);
+            cloud.position.set(pos[0], pos[1], pos[2]);
+            cloud.scale.set(1.2,0.6,0.8);
+            cloud.castShadow = true;
+            scene.add(cloud);
+        });
+        
+        // Ground plane with texture
+        const ground = new THREE.Mesh(new THREE.CircleGeometry(30, 20), new THREE.MeshStandardMaterial({ color: 0x3a5f3a, roughness:0.9 }));
+        ground.rotation.x = -Math.PI/2;
+        ground.position.y = -0.1;
+        ground.receiveShadow = true;
+        scene.add(ground);
+        
+        // Cherry trees
+        function addTree(x,z){
+            const g = new THREE.Group();
+            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.6,2.5), new THREE.MeshStandardMaterial({color:0x6b4e3a}));
+            trunk.position.y=1.25;
+            trunk.castShadow=true; trunk.receiveShadow=true;
+            g.add(trunk);
+            const leaf = new THREE.Mesh(new THREE.SphereGeometry(1.2), new THREE.MeshStandardMaterial({color:0xffaacc}));
+            leaf.position.y=2.8;
+            leaf.castShadow=true;
+            g.add(leaf);
+            g.position.set(x,0,z);
+            scene.add(g);
+        }
+        addTree(-5,2); addTree(5,1); addTree(-3,-4); addTree(4,-3);
+        
+        // Floating petals
+        const petalCount = 400;
+        const petalGeo = new THREE.BufferGeometry();
+        const pos = new Float32Array(petalCount*3);
+        for(let i=0;i<petalCount*3;i+=3){
+            pos[i] = (Math.random()-0.5)*30;
+            pos[i+1] = Math.random()*10;
+            pos[i+2] = (Math.random()-0.5)*30;
+        }
+        petalGeo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+        const petalMat = new THREE.PointsMaterial({color:0xffb7c5, size:0.15});
+        const petals = new THREE.Points(petalGeo, petalMat);
+        scene.add(petals);
+        
+        let clock = new THREE.Clock();
+        function animate(){
+            requestAnimationFrame(animate);
+            const t = performance.now()*0.001;
+            petals.rotation.y += 0.002;
+            renderer.render(scene, camera);
+        }
+        animate();
+        
+        window.addEventListener('resize', ()=>{
+            camera.aspect = innerWidth/innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(innerWidth, innerHeight);
+        });
+    </script>
+</body>
+</html>
